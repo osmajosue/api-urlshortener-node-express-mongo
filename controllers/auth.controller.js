@@ -1,8 +1,45 @@
-export const register = (req, res) => {
-    res.json({ "ok":"REGISTERED!" });
+import { User } from '../models/user.js';
+
+export const register = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        
+        let user = new User({ email, password });
+
+        await user.save();
+
+        // jwt token
+
+        return res.status(201).json({"ok": `${email} registered succesfully`});
+    } catch (error) {
+        console.log(error.code);
+
+        //Second Alternative to see if the user is already registered
+        if (error.code === 11000) {
+            return res.status(400).json({error: "The user already exists"});
+        }
+
+        return res.status(500).json({error: "Server Error"});
+    }
 }
 
-export const login = (req, res) => {
-    //console.log(req.body);
-    res.json({ "ok":"LOGGED IN!!" });
+export const login = async (req, res) => {
+    const {email, password} = req.body;
+
+   try {
+        let user = await User.findOne({email});
+        if(!user) return res.status(403).json({error: 'User does not exist'});
+
+        const passValidation = await user.comparePassword(password);
+
+        if(!passValidation) 
+            return res.status(403).json({error: 'Incorrect Password'});
+    
+        return res.json({ok: 'Logged In'});
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({error: "Server Error"});
+    }
 }
