@@ -1,4 +1,5 @@
 import { User } from '../models/user.js';
+import jwt from 'jsonwebtoken';
 
 export const register = async (req, res) => {
     const { email, password } = req.body;
@@ -29,14 +30,17 @@ export const login = async (req, res) => {
 
    try {
         let user = await User.findOne({email});
+        const token = jwt.sign({ uid: user._id}, process.env.JWT_SECRET);
+        
         if(!user) return res.status(403).json({error: 'User does not exist'});
 
         const passValidation = await user.comparePassword(password);
 
         if(!passValidation) 
             return res.status(403).json({error: 'Incorrect Password'});
-    
-        return res.json({ok: 'Logged In'});
+
+
+        return res.json({token});
 
     } catch (error) {
         console.log(error);
