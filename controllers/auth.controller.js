@@ -1,5 +1,5 @@
 import { User } from '../models/user.js';
-import jwt from 'jsonwebtoken';
+import { generateToken } from '../utils/tokenManager.js';
 
 export const register = async (req, res) => {
     const { email, password } = req.body;
@@ -30,7 +30,7 @@ export const login = async (req, res) => {
 
    try {
         let user = await User.findOne({email});
-        const token = jwt.sign({ uid: user._id}, process.env.JWT_SECRET);
+        const { token, expiresIn } = generateToken(user.id);
         
         if(!user) return res.status(403).json({error: 'User does not exist'});
 
@@ -39,11 +39,18 @@ export const login = async (req, res) => {
         if(!passValidation) 
             return res.status(403).json({error: 'Incorrect Password'});
 
-
-        return res.json({token});
-
+        return res.json({ token, expiresIn });
     } catch (error) {
         console.log(error);
         return res.status(500).json({error: "Server Error"});
+    }
+}
+
+export const userInfo = async (req, res) => {
+    try {
+        const user = await User.findById(req.uid).select('email');
+        return res.json({ user });
+    } catch (error) {
+        res.status(500).json({error: 'Non authenticated'});
     }
 }
