@@ -1,28 +1,32 @@
 import { User } from '../models/user.js';
+import { UserService } from '../services/user.service.js';
 import { generateToken } from '../utils/tokenManager.js';
 
 export const register = async (req, res) => {
     const { email, password } = req.body;
+    const userService = new UserService();
+    return userService.saveUser({email, password}, res);
 
-    try {
+    // try {
         
-        let user = new User({ email, password });
+    //     let user = new User({ email, password });
 
-        await user.save();
+    //     await user.save();
 
-        // jwt token
+    //     // jwt token
 
-        return res.status(201).json({"ok": `${email} registered succesfully`});
-    } catch (error) {
-        console.log(error.code);
+    //     return res.status(201).json({"ok": `${email} registered succesfully`});
+    // } catch (error) {
+    //     console.log(error.code);
 
-        //Second Alternative to see if the user is already registered
-        if (error.code === 11000) {
-            return res.status(400).json({error: "The user already exists"});
-        }
+    //     //Second Alternative to see if the user is already registered
+    //     if (error.code === 11000) {
+    //         return res.status(400).json({error: "The user already exists"});
+    //     }
 
-        return res.status(500).json({error: "Server Error"});
-    }
+    //     return res.status(500).json({error: "Server Error"});
+    // }
+    
 }
 
 export const login = async (req, res) => {
@@ -44,6 +48,12 @@ export const login = async (req, res) => {
         console.log(error);
         return res.status(500).json({error: "Server Error"});
     }
+}
+
+export const deleteUser = async (req, res) => {
+    const { uid } = req.params;
+    const userService = new UserService();
+    return userService.deleteUser({ uid }, res);
 }
 
 export const userInfo = async (req, res) => {

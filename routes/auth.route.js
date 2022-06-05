@@ -1,5 +1,5 @@
 import express from "express";
-import { login, register, userInfo } from "../controllers/auth.controller.js";
+import { login, register, userInfo, deleteUser } from "../controllers/auth.controller.js";
 import { body } from 'express-validator';
 import { userValidationResult } from "../middlewares/expressUserValidations.js";
 import { requireToken } from "../middlewares/requireToken.js";
@@ -42,6 +42,8 @@ userValidationResult,
 login
 );
 
-router.get('/protected', requireToken, userInfo)
+router.delete('/delete_user/:uid', deleteUser);
+
+router.get('/protected', requireToken, userInfo);
 
 export default router;
