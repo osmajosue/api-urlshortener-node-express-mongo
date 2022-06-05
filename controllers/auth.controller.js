@@ -32,12 +32,12 @@ export const login = async (req, res) => {
         let user = await User.findOne({email});
         const { token, expiresIn } = generateToken(user.id);
         
-        if(!user) return res.status(403).json({error: 'User does not exist'});
+        if(!user) return res.status(403).json({error: 'Invalid Credentials'});
 
         const passValidation = await user.comparePassword(password);
 
         if(!passValidation) 
-            return res.status(403).json({error: 'Incorrect Password'});
+            return res.status(403).json({error: 'Invalid Credentials'});
 
         return res.json({ token, expiresIn });
     } catch (error) {
@@ -47,6 +47,7 @@ export const login = async (req, res) => {
 }
 
 export const userInfo = async (req, res) => {
+    console.log(req.uid)
     try {
         const user = await User.findById(req.uid).select('email');
         return res.json({ user });
