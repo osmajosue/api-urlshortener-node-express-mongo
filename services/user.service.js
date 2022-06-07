@@ -22,10 +22,10 @@ export class UserService {
 
     async deleteUser (user, res) {
         try {
-            const usuario = await User.findOne({uid: user.uid});
-            await User.deleteOne({ usuario });
+            const usr = await User.findOne({uid: user.uid});
+            await User.deleteOne({ usr });
 
-            return res.status(204);
+            return res.status(204).json({"ok": `OK`});
 
         } catch (error) {
             console.log(error);
@@ -35,6 +35,16 @@ export class UserService {
             }
     
             return res.status(500).json({error: "Server Error"});
+        }
+    }
+
+    async getUserInfo (user, res) {
+        const uid = user.uid;
+        try {
+            const usr = await User.findById(uid).select('email').lean();
+            return res.json({ usr });
+        } catch (error) {
+            res.status(500).json({error: 'Non authenticated'});
         }
     }
 }

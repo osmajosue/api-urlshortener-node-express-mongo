@@ -11,12 +11,22 @@ export const requireToken = (req, res, next) => {
         token = token.split(' ')[1];
 
         const { uid } = jwt.verify(token, process.env.JWT_SECRET);
-        console.log(uid);
+        // console.log(uid);
 
         req.uid = uid;
-        
+
         next();
     } catch (error) {
-        return res.status(401).json({error: error.message})
+
+        const TokenVerificationErrors = {
+            "invalid signature": "JWT signature is not valid",
+            "jwt expired": "JWT has expired",
+            "invalid token": "Invalid Token",
+            "No Bearer": "Use Bearer format"
+        }
+
+        return res
+            .status(401)
+            .json({error: TokenVerificationErrors[error.message]})
     }
 }

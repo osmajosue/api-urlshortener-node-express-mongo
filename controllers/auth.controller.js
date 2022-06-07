@@ -57,11 +57,14 @@ export const deleteUser = async (req, res) => {
 }
 
 export const userInfo = async (req, res) => {
-    console.log(req.uid)
-    try {
-        const user = await User.findById(req.uid).select('email');
-        return res.json({ user });
-    } catch (error) {
-        res.status(500).json({error: 'Non authenticated'});
-    }
+    // const { uid } = req.params;
+    const userService = new UserService();
+    return userService.getUserInfo( req , res);
+
+    // try {
+    //     const user = await User.findById(req.uid).select('email').lean();
+    //     return res.json({ user });
+    // } catch (error) {
+    //     res.status(500).json({error: 'Non authenticated'});
+    // }
 }
