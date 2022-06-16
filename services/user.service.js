@@ -41,8 +41,8 @@ export class UserService {
     async getUserInfo (user, res) {
         const uid = user.uid;
         try {
-            const usr = await User.findById(uid).select('email').lean();
-            return res.json({ usr });
+            const usr = await User.findById(uid).lean();
+            return res.json({ email: usr.email });
         } catch (error) {
             res.status(500).json({error: 'Non authenticated'});
         }

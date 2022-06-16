@@ -1,6 +1,7 @@
 import { User } from '../models/user.js';
 import { UserService } from '../services/user.service.js';
-import { generateToken } from '../utils/tokenManager.js';
+import { generateRefreshToken, generateToken } from '../utils/tokenManager.js';
+import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
     const { email, password } = req.body;
@@ -34,7 +35,6 @@ export const login = async (req, res) => {
 
    try {
         let user = await User.findOne({email});
-        const { token, expiresIn } = generateToken(user.id);
         
         if(!user) return res.status(403).json({error: 'Invalid Credentials'});
 
@@ -42,6 +42,15 @@ export const login = async (req, res) => {
 
         if(!passValidation) 
             return res.status(403).json({error: 'Invalid Credentials'});
+        //Generating JWT
+        const { token, expiresIn } = generateToken(user.id);
+        generateRefreshToken(user.id, res)
+
+        // Saving the JWT in the cookies
+        // res.cookie("token", token, {
+        //     httpOnly: true,
+        //     secure: !(process.env.MODE === "developer"),
+        // });
 
         return res.json({ token, expiresIn });
     } catch (error) {
@@ -67,4 +76,30 @@ export const userInfo = async (req, res) => {
     // } catch (error) {
     //     res.status(500).json({error: 'Non authenticated'});
     // }
+}
+
+
+export const refreshToken = (req, res) => {
+    try {
+        const refreshTokenCookie = req.cookies.refreshToken;
+        if(!refreshTokenCookie) throw new Error('There is no token in the headers. Bearer should be used')
+
+        const { uid } = jwt.verify(refreshTokenCookie, process.env.JWT_REFRESH);
+
+        const { token, expiresIn } = generateToken(uid);
+        
+        return res.json({ token, expiresIn });
+    } catch (error) {
+        const TokenVerificationErrors = {
+            "invalid signature": "JWT signature is not valid",
+            "jwt expired": "JWT has expired",
+            "invalid token": "Invalid Token",
+            "No Bearer": "Use Bearer format",
+            "jwt malformed" : "Token Malformado o Incorrecto"
+        }
+
+        return res
+            .status(401)
+            .json({error: TokenVerificationErrors[error.message]})
+    }
 }

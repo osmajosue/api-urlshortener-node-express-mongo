@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <form id="form">
+        <input type="email" value="odiaz@test.com" id="email"/>
+        <input type="password" value="123456" id="password"/>
+        <button type="submit"> Login </button>
+    </form>
+
+    <script>
+        const form = document.getElementById('form');
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const res = await fetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({email: email.value, password: password.value})
+                })
+                console.log(res.ok, res.status);
+
+                if(!res.ok) return;
+
+                const data = await res.json();
+
+                //Saving the JWT in LocalStorage
+                // const { token } = data;
+
+                // localStorage.setItem('token', token);
+
+                console.log(data);
+            } catch (error) {
+                console.log(error);
+            }
+        })
+    </script>
+</body>
+</html>

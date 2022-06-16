@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protected Route</title>
+</head>
+<body>
+    <h1>Protected Route</h1>
+    <div>
+        <h2 id="app">Email: </h2>
+    </div>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', async e => {
+            try {
+                // const token = localStorage.getItem('token');
+                const res = await fetch('/api/v1/auth/protected', {
+                    method: 'GET', 
+                    headers: {
+                        // Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include",
+                });
+                console.log(res.ok, res.status);
+                const data = await res.json();
+
+                if (res.ok)
+                    document.getElementById('app').textContent = data.email;
+                
+                console.log(data);
+            } catch (error) {
+                console.log(error)
+            }
+        })
+    </script>
+</body>
+</html>
