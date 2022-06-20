@@ -6,28 +6,7 @@ import jwt from "jsonwebtoken";
 export const register = async (req, res) => {
     const { email, password } = req.body;
     const userService = new UserService();
-    return userService.saveUser({email, password}, res);
-
-    // try {
-        
-    //     let user = new User({ email, password });
-
-    //     await user.save();
-
-    //     // jwt token
-
-    //     return res.status(201).json({"ok": `${email} registered succesfully`});
-    // } catch (error) {
-    //     console.log(error.code);
-
-    //     //Second Alternative to see if the user is already registered
-    //     if (error.code === 11000) {
-    //         return res.status(400).json({error: "The user already exists"});
-    //     }
-
-    //     return res.status(500).json({error: "Server Error"});
-    // }
-    
+    return userService.saveUser({email, password}, res);    
 }
 
 export const login = async (req, res) => {
@@ -78,7 +57,6 @@ export const userInfo = async (req, res) => {
     // }
 }
 
-
 export const refreshToken = (req, res) => {
     try {
         const refreshTokenCookie = req.cookies.refreshToken;
@@ -87,7 +65,7 @@ export const refreshToken = (req, res) => {
         const { uid } = jwt.verify(refreshTokenCookie, process.env.JWT_REFRESH);
 
         const { token, expiresIn } = generateToken(uid);
-        
+
         return res.json({ token, expiresIn });
     } catch (error) {
         const TokenVerificationErrors = {

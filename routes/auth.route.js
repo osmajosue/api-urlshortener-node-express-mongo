@@ -45,6 +45,7 @@ login
 router.delete('/delete_user/:uid', deleteUser);
 
 router.get('/protected', requireToken, userInfo);
+
 router.get('/refresh', refreshToken);
 
 export default router;
